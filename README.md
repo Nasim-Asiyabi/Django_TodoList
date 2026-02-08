@@ -19,45 +19,6 @@ A comprehensive Django web application for managing tasks and reminders with adv
 
 ✅ SQLite Database - Lightweight and easy to set up
 
-📸 Screenshots
-(Add your screenshots here)
-
-<!-- | Task List | Create Task | Task Detail | |-----------|-------------|-------------| | ![Task List](screenshots/list.png) | ![Create Task](screenshots/create.png) | ![Task Detail](screenshots/detail.png) | -->
-🏗️ Project Structure
-text
-django-reminder-app/
-├── reminder/                  # Main project configuration
-│   ├── __init__.py
-│   ├── settings.py           # Django settings
-│   ├── urls.py               # Main URL configuration
-│   ├── asgi.py               # ASGI configuration
-│   └── wsgi.py               # WSGI configuration
-├── todo/                     # Core task management app
-│   ├── migrations/           # Database migrations
-│   ├── templates/todo/       # HTML templates
-│   │   ├── base.html
-│   │   ├── index.html
-│   │   ├── task_detail.html
-│   │   ├── task_form.html
-│   │   ├── task_status_form.html
-│   │   └── task_confirm_delete.html
-│   ├── __init__.py
-│   ├── admin.py             # Admin configuration
-│   ├── apps.py              # App configuration
-│   ├── models.py            # Data models with custom Manager
-│   ├── tests.py             # Unit tests
-│   ├── urls.py              # App URL routing
-│   └── views.py             # Class-Based Views
-├── calender/                # Calendar integration app
-├── notification/            # Notification system app
-├── manage.py               # Django command-line utility
-├── requirements.txt        # Python dependencies
-├── LICENSE                 # MIT License
-└── README.md              # This file
-🚀 Quick Start
-Prerequisites
-Python 3.8 or higher
-
 pip (Python package manager)
 
 Installation Steps
