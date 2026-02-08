@@ -1,0 +1,627 @@
+{% extends 'todo/base.html' %}
+
+{% block title %}{{ task.title }} - Task Details{% endblock %}
+
+{% block content %}
+<div class="task-detail-container">
+    <!-- Task Header -->
+    <div class="task-header {% if task.done %}completed{% else %}pending{% endif %}">
+        <div class="task-status-indicator">
+            {% if task.done %}
+            <div class="status-icon completed">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="status-text">
+                <h1>✅ Task Completed</h1>
+                <p>Great job! This task is finished.</p>
+            </div>
+            {% else %}
+            <div class="status-icon pending">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="status-text">
+                <h1>📝 Task in Progress</h1>
+                <p>This task is pending completion.</p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <h2 class="task-title">{{ task.title }}</h2>
+        
+        {% if is_expired %}
+        <div class="expired-alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>⚠️ This task is EXPIRED! It was due on {{ task.due_date|date:"M d, Y" }}</span>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Task Details Card -->
+    <div class="task-details-card">
+        <h3><i class="fas fa-info-circle"></i> Task Information</h3>
+        
+        <div class="details-grid">
+            <div class="detail-item">
+                <div class="detail-label">
+                    <i class="fas fa-calendar-alt"></i> Due Date
+                </div>
+                <div class="detail-value {% if is_expired %}expired{% endif %}">
+                    {{ task.due_date|date:"l, F d, Y" }}
+                    {% if is_expired %}
+                    <span class="expired-badge">Expired</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">
+                    <i class="fas fa-clock"></i> Due Time
+                </div>
+                <div class="detail-value">
+                    {% if task.due_time %}
+                    {{ task.due_time|time:"g:i A" }}
+                    {% else %}
+                    <span class="no-time">Not specified</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">
+                    <i class="fas fa-user"></i> Created By
+                </div>
+                <div class="detail-value">
+                    {{ task.user.username|default:"System" }}
+                </div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">
+                    <i class="fas fa-calendar-plus"></i> Created On
+                </div>
+                <div class="detail-value">
+                    {{ task.created_at|date:"M d, Y"|default:"Unknown" }}
+                </div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">
+                    <i class="fas fa-history"></i> Last Updated
+                </div>
+                <div class="detail-value">
+                    {{ task.updated_at|date:"M d, Y"|default:"Unknown" }}
+                </div>
+            </div>
+            
+            <div class="detail-item">
+                <div class="detail-label">
+                    <i class="fas fa-tachometer-alt"></i> Progress
+                </div>
+                <div class="detail-value">
+                    {% if task.done %}
+                    <div class="progress-bar completed">
+                        <div class="progress-fill" style="width: 100%"></div>
+                        <span class="progress-text">100% Complete</span>
+                    </div>
+                    {% else %}
+                    <div class="progress-bar pending">
+                        <div class="progress-fill" style="width: 30%"></div>
+                        <span class="progress-text">In Progress</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="action-section">
+        <h3><i class="fas fa-cogs"></i> Task Actions</h3>
+        
+        <div class="action-buttons">
+            <!-- Status Toggle Button -->
+            <a href="{% url 'todo:task_update_status' task.pk %}" 
+               class="btn btn-status {% if task.done %}btn-uncomplete{% else %}btn-complete{% endif %}">
+                {% if task.done %}
+                <i class="fas fa-undo"></i> Mark as Not Completed
+                {% else %}
+                <i class="fas fa-check"></i> Mark as Completed
+                {% endif %}
+            </a>
+            
+            <!-- Edit Button -->
+            <a href="{% url 'todo:task_edit' task.pk %}" class="btn btn-edit">
+                <i class="fas fa-edit"></i> Edit Task
+            </a>
+            
+            <!-- Delete Button -->
+            <a href="{% url 'todo:task_delete' task.pk %}" class="btn btn-delete">
+                <i class="fas fa-trash"></i> Delete Task
+            </a>
+            
+            <!-- Back to List -->
+            <a href="{% url 'todo:task_list' %}" class="btn btn-back">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+        
+        <!-- Quick Status Update -->
+        <div class="quick-actions">
+            <h4><i class="fas fa-bolt"></i> Quick Actions</h4>
+            <div class="quick-buttons">
+                {% if not task.done %}
+                <form method="post" action="{% url 'todo:task_update_status' task.pk %}" class="quick-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="done" value="true">
+                    <button type="submit" class="btn btn-quick-complete">
+                        <i class="fas fa-check"></i> Mark Done Now
+                    </button>
+                </form>
+                {% endif %}
+                
+                <a href="{% url 'todo:task_create' %}" class="btn btn-quick-new">
+                    <i class="fas fa-plus"></i> Create Similar Task
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success/Info Messages Area -->
+    <div class="messages-area">
+        <h4><i class="fas fa-comment-dots"></i> Recent Activity</h4>
+        
+        <div class="activity-list">
+            {% if task.done %}
+            <div class="activity-item success">
+                <i class="fas fa-check-circle"></i>
+                <div class="activity-content">
+                    <strong>Task Completed</strong>
+                    <p>This task was marked as completed{% if task.updated_at %} on {{ task.updated_at|date:"M d, Y" }}{% endif %}.</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if is_expired %}
+            <div class="activity-item warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div class="activity-content">
+                    <strong>Task Expired</strong>
+                    <p>This task is past its due date ({{ task.due_date|date:"M d, Y" }}).</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="activity-item info">
+                <i class="fas fa-info-circle"></i>
+                <div class="activity-content">
+                    <strong>Task Created</strong>
+                    <p>This task was created{% if task.created_at %} on {{ task.created_at|date:"M d, Y" }}{% endif %}.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .task-detail-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .task-header {
+        padding: 40px;
+        border-bottom: 3px solid #e9ecef;
+    }
+    
+    .task-header.completed {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    }
+    
+    .task-header.pending {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    }
+    
+    .task-status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .status-icon {
+        font-size: 3.5rem;
+    }
+    
+    .status-icon.completed {
+        color: #28a745;
+    }
+    
+    .status-icon.pending {
+        color: #ffc107;
+    }
+    
+    .status-text h1 {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    
+    .status-text p {
+        color: #666;
+        font-size: 1.1rem;
+    }
+    
+    .task-title {
+        font-size: 2.8rem;
+        color: #333;
+        margin: 20px 0;
+        line-height: 1.3;
+    }
+    
+    .expired-alert {
+        background: #dc3545;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.7; }
+        100% { opacity: 1; }
+    }
+    
+    .task-details-card {
+        padding: 40px;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .task-details-card h3 {
+        color: #333;
+        margin-bottom: 30px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+    }
+    
+    .detail-item {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+    }
+    
+    .detail-value {
+        font-size: 1.2rem;
+        color: #212529;
+    }
+    
+    .detail-value.expired {
+        color: #dc3545;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .expired-badge {
+        background: #dc3545;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 15px;
+        font-size: 0.9rem;
+    }
+    
+    .no-time {
+        color: #6c757d;
+        font-style: italic;
+    }
+    
+    .progress-bar {
+        height: 30px;
+        background: #e9ecef;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+        margin-top: 10px;
+    }
+    
+    .progress-bar.completed .progress-fill {
+        background: linear-gradient(90deg, #28a745, #20c997);
+    }
+    
+    .progress-bar.pending .progress-fill {
+        background: linear-gradient(90deg, #ffc107, #fd7e14);
+    }
+    
+    .progress-fill {
+        height: 100%;
+        transition: width 0.5s ease;
+    }
+    
+    .progress-text {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    .action-section {
+        padding: 40px;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .action-section h3 {
+        color: #333;
+        margin-bottom: 30px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 40px;
+    }
+    
+    .btn {
+        padding: 15px 30px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .btn-status {
+        flex: 2;
+    }
+    
+    .btn-complete {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+    
+    .btn-uncomplete {
+        background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        color: white;
+    }
+    
+    .btn-edit {
+        background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
+        color: white;
+    }
+    
+    .btn-delete {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+    }
+    
+    .btn-back {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    
+    .quick-actions {
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+    }
+    
+    .quick-actions h4 {
+        color: #333;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .quick-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-quick-complete {
+        background: #28a745;
+        color: white;
+        padding: 12px 25px;
+        font-size: 0.9rem;
+    }
+    
+    .btn-quick-new {
+        background: #17a2b8;
+        color: white;
+        padding: 12px 25px;
+        font-size: 0.9rem;
+    }
+    
+    .messages-area {
+        padding: 40px;
+    }
+    
+    .messages-area h4 {
+        color: #333;
+        margin-bottom: 25px;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 5px solid;
+    }
+    
+    .activity-item.success {
+        background: #d4edda;
+        border-left-color: #28a745;
+    }
+    
+    .activity-item.warning {
+        background: #fff3cd;
+        border-left-color: #ffc107;
+    }
+    
+    .activity-item.info {
+        background: #d1ecf1;
+        border-left-color: #17a2b8;
+    }
+    
+    .activity-item i {
+        font-size: 1.5rem;
+        margin-top: 5px;
+    }
+    
+    .activity-item.success i {
+        color: #28a745;
+    }
+    
+    .activity-item.warning i {
+        color: #ffc107;
+    }
+    
+    .activity-item.info i {
+        color: #17a2b8;
+    }
+    
+    .activity-content strong {
+        display: block;
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+        color: #212529;
+    }
+    
+    .activity-content p {
+        color: #495057;
+        margin: 0;
+        line-height: 1.5;
+    }
+    
+    @media (max-width: 768px) {
+        .task-detail-container {
+            margin: 15px;
+            border-radius: 15px;
+        }
+        
+        .task-header {
+            padding: 25px 20px;
+        }
+        
+        .task-title {
+            font-size: 2rem;
+        }
+        
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+        
+        .quick-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add confirmation for delete button
+        const deleteBtn = document.querySelector('.btn-delete');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', function(e) {
+                if (!confirm('Are you sure you want to delete this task? This action cannot be undone.')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        }
+        
+        // Add visual feedback for status toggle
+        const statusBtn = document.querySelector('.btn-status');
+        if (statusBtn) {
+            statusBtn.addEventListener('click', function(e) {
+                const newStatus = statusBtn.classList.contains('btn-complete') ? 'completed' : 'not completed';
+                if (!confirm(`Are you sure you want to mark this task as ${newStatus}?`)) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        }
+        
+        // Auto-scroll to messages if there are any
+        const messages = document.querySelector('.messages-area');
+        if (messages && window.location.hash === '#messages') {
+            messages.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+</script>
+{% endblock %}

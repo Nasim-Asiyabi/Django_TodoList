@@ -1,0 +1,209 @@
+{% extends 'todo/base.html' %}
+
+{% block title %}Update Task Status{% endblock %}
+
+{% block content %}
+<div class="status-form-container">
+    <h1 class="form-title">Update Task Status</h1>
+
+    <div class="task-info">
+        <h3>Task: {{ object.title }}</h3>
+        <p>Due Date: {{ object.due_date|date:"F d, Y" }}</p>
+        {% if object.is_past_due_and_incomplete %}
+        <p class="expired-warning"><i class="fas fa-exclamation-triangle"></i> This task is expired!</p>
+        {% endif %}
+    </div>
+
+    <form method="post" class="status-form">
+        {% csrf_token %}
+
+        <div class="status-options">
+            <div class="status-option">
+                <input type="radio" id="status_done" name="done" value="true" {% if object.done %}checked{% endif %}>
+                <label for="status_done" class="status-label done">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Completed</span>
+                </label>
+            </div>
+
+            <div class="status-option">
+                <input type="radio" id="status_not_done" name="done" value="false" {% if not object.done %}checked{% endif %}>
+                <label for="status_not_done" class="status-label not-done">
+                    <i class="fas fa-clock"></i>
+                    <span>Not Completed</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-update">
+                <i class="fas fa-save"></i> Update Status
+            </button>
+            <a href="{% url 'todo:task_detail' object.pk %}" class="btn btn-cancel">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .status-form-container {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 30px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .form-title {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+        font-size: 28px;
+    }
+
+    .task-info {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        border-left: 4px solid #667eea;
+    }
+
+    .task-info h3 {
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .task-info p {
+        color: #666;
+        margin: 5px 0;
+    }
+
+    .expired-warning {
+        color: #dc3545 !important;
+        font-weight: 600;
+        margin-top: 10px !important;
+    }
+
+    .status-options {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .status-option {
+        display: flex;
+        align-items: center;
+    }
+
+    .status-option input[type="radio"] {
+        display: none;
+    }
+
+    .status-label {
+        flex: 1;
+        padding: 20px;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 18px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .status-label.done {
+        color: #28a745;
+    }
+
+    .status-label.not-done {
+        color: #6c757d;
+    }
+
+    .status-label i {
+        font-size: 24px;
+    }
+
+    .status-option input[type="radio"]:checked + .status-label {
+        border-color: #667eea;
+        background-color: rgba(102, 126, 234, 0.05);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .status-option input[type="radio"]:checked + .status-label.done {
+        background-color: rgba(40, 167, 69, 0.05);
+        border-color: #28a745;
+    }
+
+    .status-option input[type="radio"]:checked + .status-label.not-done {
+        background-color: rgba(108, 117, 125, 0.05);
+        border-color: #6c757d;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex: 1;
+    }
+
+    .btn-update {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-cancel {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .btn-update:hover {
+        background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    }
+
+    .btn-cancel:hover {
+        background-color: #5a6268;
+    }
+
+    @media (max-width: 768px) {
+        .status-form-container {
+            padding: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}

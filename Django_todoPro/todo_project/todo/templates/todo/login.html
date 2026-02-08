@@ -1,0 +1,256 @@
+{% extends 'todo/base.html' %}
+
+{% block title %}Login - Todo App{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1><i class="fas fa-sign-in-alt"></i> Login</h1>
+            <p>Sign in to your account to manage your tasks</p>
+        </div>
+        
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            Invalid username or password. Please try again.
+        </div>
+        {% endif %}
+        
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_username">
+                    <i class="fas fa-user"></i> Username
+                </label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <div class="form-error">{{ form.username.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password">
+                    <i class="fas fa-lock"></i> Password
+                </label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                <div class="form-error">{{ form.password.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+            </div>
+            
+            <div class="auth-links">
+                <p>Don't have an account? 
+                    <a href="{% url 'todo:register' %}">Register here</a>
+                </p>
+                <p>
+                    <a href="{% url 'todo:task_list' %}">Back to home</a>
+                </p>
+            </div>
+        </form>
+    </div>
+    
+    <div class="auth-info">
+        <h3><i class="fas fa-info-circle"></i> Demo Accounts</h3>
+        <div class="demo-accounts">
+            <div class="demo-account">
+                <strong>Username:</strong> demo_user<br>
+                <strong>Password:</strong> demopass123
+            </div>
+            <div class="demo-account">
+                <strong>Username:</strong> test_user<br>
+                <strong>Password:</strong> testpass123
+            </div>
+        </div>
+        <p class="note">Note: These are demo accounts. Create your own account for full access.</p>
+    </div>
+</div>
+
+<style>
+    .auth-container {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    
+    .auth-card {
+        background: white;
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .auth-header h1 {
+        color: #333;
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .auth-header p {
+        color: #666;
+        font-size: 1.1rem;
+    }
+    
+    .alert {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .alert-danger {
+        background-color: #fee;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+    
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+    }
+    
+    .form-group input {
+        padding: 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-group input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-error {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    .btn {
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .btn-block {
+        width: 100%;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .auth-links {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .auth-links p {
+        color: #666;
+        margin: 10px 0;
+    }
+    
+    .auth-links a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+    }
+    
+    .auth-links a:hover {
+        text-decoration: underline;
+    }
+    
+    .auth-info {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .auth-info h3 {
+        color: #495057;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .demo-accounts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .demo-account {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+        font-size: 0.9rem;
+    }
+    
+    .note {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-style: italic;
+        margin-top: 15px;
+    }
+</style>
+{% endblock %}

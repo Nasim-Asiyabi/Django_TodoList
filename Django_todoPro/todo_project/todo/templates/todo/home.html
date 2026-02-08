@@ -1,0 +1,240 @@
+{% extends 'todo/base.html' %}
+
+{% block title %}Welcome to Todo App{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1><i class="fas fa-tasks"></i> Welcome to Todo App</h1>
+            <p class="hero-subtitle">Manage your tasks efficiently and stay organized</p>
+            
+            <div class="hero-features">
+                <div class="feature">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Task Management</h3>
+                    <p>Create, update, and organize your tasks</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-bell"></i>
+                    <h3>Deadline Alerts</h3>
+                    <p>Never miss a deadline with expiration tracking</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Progress Tracking</h3>
+                    <p>Monitor your productivity and completion rate</p>
+                </div>
+            </div>
+            
+            <div class="hero-actions">
+                <a href="{% url 'todo:login' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a href="{% url 'todo:register' %}" class="btn btn-success btn-lg">
+                    <i class="fas fa-user-plus"></i> Register
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="info-section">
+        <div class="info-card">
+            <h2><i class="fas fa-rocket"></i> Get Started</h2>
+            <p>Join thousands of users who are already managing their tasks with our app.</p>
+            <ul class="benefits-list">
+                <li><i class="fas fa-check"></i> Free to use</li>
+                <li><i class="fas fa-check"></i> No credit card required</li>
+                <li><i class="fas fa-check"></i> Mobile friendly</li>
+                <li><i class="fas fa-check"></i> Secure and private</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    .home-container {
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+    }
+    
+    .hero-section {
+        text-align: center;
+        max-width: 800px;
+        margin-bottom: 50px;
+    }
+    
+    .hero-content h1 {
+        font-size: 3.5rem;
+        color: #333;
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.5rem;
+        color: #666;
+        margin-bottom: 40px;
+    }
+    
+    .hero-features {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin: 40px 0;
+        flex-wrap: wrap;
+    }
+    
+    .feature {
+        flex: 1;
+        min-width: 250px;
+        padding: 30px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .feature:hover {
+        transform: translateY(-10px);
+    }
+    
+    .feature i {
+        font-size: 3rem;
+        color: #667eea;
+        margin-bottom: 20px;
+    }
+    
+    .feature h3 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+    }
+    
+    .feature p {
+        color: #666;
+        line-height: 1.6;
+    }
+    
+    .hero-actions {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 40px;
+    }
+    
+    .btn {
+        padding: 15px 30px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.2rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-lg {
+        padding: 18px 40px;
+        font-size: 1.3rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .btn-success {
+        background: linear-gradient(135deg, #36D1DC 0%, #5B86E5 100%);
+        color: white;
+    }
+    
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+    
+    .info-section {
+        max-width: 800px;
+        margin-top: 50px;
+    }
+    
+    .info-card {
+        background: white;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .info-card h2 {
+        color: #333;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 2rem;
+    }
+    
+    .info-card p {
+        color: #666;
+        font-size: 1.2rem;
+        line-height: 1.6;
+        margin-bottom: 25px;
+    }
+    
+    .benefits-list {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .benefits-list li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #666;
+        font-size: 1.1rem;
+    }
+    
+    .benefits-list li i {
+        color: #4CAF50;
+    }
+    
+    @media (max-width: 768px) {
+        .hero-content h1 {
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+        }
+        
+        .hero-features {
+            flex-direction: column;
+        }
+        
+        .hero-actions {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .benefits-list {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

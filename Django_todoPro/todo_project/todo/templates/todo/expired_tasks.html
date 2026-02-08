@@ -1,0 +1,382 @@
+{% extends 'todo/base.html' %}
+
+{% block title %}Expired Tasks - Todo App{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1><i class="fas fa-exclamation-triangle"></i> Expired Tasks</h1>
+        <p class="subtitle">Tasks that have passed their due date and are not completed</p>
+    </div>
+
+    {% if expired_tasks %}
+    <div class="stats-section">
+        <div class="stat-card">
+            <div class="stat-number">{{ expired_tasks.count }}</div>
+            <div class="stat-label">Expired Tasks</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ today_date|date:"M d, Y" }}</div>
+            <div class="stat-label">Today's Date</div>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="tasks-table">
+            <thead>
+                <tr>
+                    <th>Task Title</th>
+                    <th>Due Date</th>
+                    <th>Due Time</th>
+                    <th>Status</th>
+                    <th>Days Late</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in expired_tasks %}
+                <tr class="task-row {% cycle 'even' 'odd' %}">
+                    <td>
+                        <div class="task-title-cell">
+                            <strong>{{ task.title }}</strong>
+                            <small class="task-id">ID: #{{ task.id }}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="due-date-cell">
+                            <span class="date">{{ task.due_date|date:"M d, Y" }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        {% if task.due_time %}
+                        <span class="time">{{ task.due_time|time:"g:i A" }}</span>
+                        {% else %}
+                        <span class="no-time">Not set</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="status-badge expired">
+                            <i class="fas fa-clock"></i> Expired
+                        </span>
+                    </td>
+                    <td>
+                        {% with days_late=task.due_date|timesince %}
+                        <span class="days-late-badge">{{ days_late }}</span>
+                        {% endwith %}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'todo:task_detail' task.pk %}" class="btn btn-view" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'todo:task_update_status' task.pk %}" class="btn btn-complete" title="Mark as Done">
+                                <i class="fas fa-check-circle"></i>
+                            </a>
+                            <a href="{% url 'todo:task_edit' task.pk %}" class="btn btn-edit" title="Edit Task">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="summary-section">
+        <h3><i class="fas fa-chart-bar"></i> Summary</h3>
+        <p>Total <strong>{{ expired_tasks.count }}</strong> expired tasks found.</p>
+        <p>These tasks were due on or before {{ today_date|date:"F d, Y" }}</p>
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>No Expired Tasks!</h2>
+        <p>Great job! All tasks are either completed or have future due dates.</p>
+        <div class="empty-actions">
+            <a href="{% url 'todo:task_list' %}" class="btn btn-primary">
+                <i class="fas fa-list"></i> View All Tasks
+            </a>
+            <a href="{% url 'todo:task_create' %}" class="btn btn-success">
+                <i class="fas fa-plus"></i> Create New Task
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="navigation-buttons">
+        <a href="{% url 'todo:task_list' %}" class="btn btn-back">
+            <i class="fas fa-arrow-left"></i> Back to All Tasks
+        </a>
+        <a href="{% url 'todo:task_create' %}" class="btn btn-create">
+            <i class="fas fa-plus"></i> Add New Task
+        </a>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .header-section {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        color: white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .header-section h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .header-section .subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .stats-section {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 20px 30px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        min-width: 150px;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .table-wrapper {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        margin-bottom: 30px;
+        overflow-x: auto;
+    }
+
+    .tasks-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .tasks-table th {
+        background: #f8f9fa;
+        padding: 15px;
+        text-align: left;
+        font-weight: 600;
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    .tasks-table td {
+        padding: 15px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .task-row:hover {
+        background-color: #f8f9fa;
+    }
+
+    .task-row.even {
+        background-color: #f8f9fa;
+    }
+
+    .task-row.odd {
+        background-color: white;
+    }
+
+    .task-title-cell {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .task-id {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+
+    .due-date-cell .date {
+        font-weight: 600;
+        color: #dc3545;
+    }
+
+    .time {
+        color: #495057;
+        font-weight: 500;
+    }
+
+    .no-time {
+        color: #adb5bd;
+        font-style: italic;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .status-badge.expired {
+        background-color: #fee;
+        color: #dc3545;
+        border: 1px solid #f5c6cb;
+    }
+
+    .days-late-badge {
+        background-color: #fff3cd;
+        color: #856404;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-view {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .btn-complete {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .btn-edit {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .summary-section {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .summary-section h3 {
+        color: #495057;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        margin: 30px 0;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: #28a745;
+        margin-bottom: 20px;
+    }
+
+    .empty-state h2 {
+        color: #28a745;
+        margin-bottom: 10px;
+    }
+
+    .empty-state p {
+        color: #6c757d;
+        margin-bottom: 30px;
+        font-size: 1.1rem;
+    }
+
+    .empty-actions {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 25px;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+        padding: 12px 25px;
+    }
+
+    .navigation-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+    }
+
+    .btn-back {
+        background-color: #6c757d;
+        color: white;
+        padding: 12px 25px;
+    }
+
+    .btn-create {
+        background-color: #28a745;
+        color: white;
+        padding: 12px 25px;
+    }
+</style>
+{% endblock %}

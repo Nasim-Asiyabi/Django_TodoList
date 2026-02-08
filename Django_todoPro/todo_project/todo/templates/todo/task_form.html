@@ -1,0 +1,375 @@
+{% extends 'todo/base.html' %}
+
+{% block title %}{{ form_title|default:"Task Form" }}{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1><i class="fas fa-tasks"></i> {{ form_title|default:"Task Form" }}</h1>
+        <p class="form-subtitle">
+            {% if form_title == "Edit Task" %}
+            Update your task details below
+            {% else %}
+            Create a new task by filling out the form below
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Special messages for this form -->
+    {% if not messages %}
+    <div class="form-tips">
+        <div class="tip">
+            <i class="fas fa-lightbulb"></i>
+            <strong>Tip:</strong> Set realistic due dates to avoid expired tasks.
+        </div>
+        {% if form_title == "Edit Task" %}
+        <div class="tip">
+            <i class="fas fa-edit"></i>
+            <strong>Note:</strong> You can update any field of your task.
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <form method="post" class="task-form" novalidate>
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="form-errors">
+            <div class="error-header">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3>Please correct the following errors:</h3>
+            </div>
+            <ul class="error-list">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                    <li>
+                        <strong>{{ field.label }}:</strong> {{ error }}
+                    </li>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <div class="form-fields">
+            <!-- Title Field -->
+            <div class="form-group">
+                <label for="id_title">
+                    <i class="fas fa-heading"></i> Task Title *
+                </label>
+                {{ form.title }}
+                <div class="form-help">
+                    Enter a clear and descriptive title for your task
+                </div>
+            </div>
+
+            <!-- Due Date Field -->
+            <div class="form-group">
+                <label for="id_due_date">
+                    <i class="fas fa-calendar-day"></i> Due Date *
+                </label>
+                {{ form.due_date }}
+                <div class="form-help">
+                    Select when this task needs to be completed
+                </div>
+            </div>
+
+            <!-- Due Time Field -->
+            <div class="form-group">
+                <label for="id_due_time">
+                    <i class="fas fa-clock"></i> Due Time (Optional)
+                </label>
+                {{ form.due_time }}
+                <div class="form-help">
+                    Specify a time if needed (leave empty for all day)
+                </div>
+            </div>
+
+            <!-- Status Field -->
+            <div class="form-group checkbox-group">
+                <div class="checkbox-wrapper">
+                    {{ form.done }}
+                    <label for="id_done" class="checkbox-label">
+                        <i class="fas fa-check-square"></i>
+                        Mark as completed
+                    </label>
+                </div>
+                <div class="form-help">
+                    Check this box if the task is already completed
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-submit">
+                <i class="fas fa-save"></i> {{ submit_text|default:"Save Task" }}
+            </button>
+            <a href="{{ cancel_url|default:'/tasks/' }}" class="btn btn-cancel">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+
+            {% if form_title == "Edit Task" %}
+            <a href="{% url 'todo:task_delete' object.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete Task
+            </a>
+            {% endif %}
+        </div>
+
+        <div class="form-footer">
+            <p><i class="fas fa-info-circle"></i> Fields marked with * are required</p>
+        </div>
+    </form>
+</div>
+
+<style>
+    .form-container {
+        max-width: 700px;
+        margin: 30px auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .form-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .form-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-top: 10px;
+    }
+
+    .form-tips {
+        background: #e3f2fd;
+        border-left: 5px solid #2196F3;
+        margin: 20px 30px;
+        padding: 15px 20px;
+        border-radius: 8px;
+    }
+
+    .tip {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #0d47a1;
+        margin: 5px 0;
+    }
+
+    .tip i {
+        color: #2196F3;
+    }
+
+    .task-form {
+        padding: 30px;
+    }
+
+    .form-errors {
+        background: #ffebee;
+        border: 1px solid #ffcdd2;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .error-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #c62828;
+        margin-bottom: 15px;
+    }
+
+    .error-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .error-list li {
+        padding: 8px 0;
+        border-bottom: 1px solid #ffcdd2;
+        color: #b71c1c;
+    }
+
+    .error-list li:last-child {
+        border-bottom: none;
+    }
+
+    .form-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: #333;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-help {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 5px;
+        padding-left: 5px;
+    }
+
+    .checkbox-group {
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+    }
+
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        margin: 0;
+    }
+
+    .checkbox-label {
+        cursor: pointer;
+        font-weight: normal;
+        margin: 0;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 40px;
+        padding-top: 25px;
+        border-top: 1px solid #e9ecef;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 15px 30px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex: 1;
+        min-width: 150px;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+        color: white;
+    }
+
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+        color: white;
+    }
+
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    .form-footer {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+        text-align: center;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .form-footer i {
+        color: #667eea;
+        margin-right: 5px;
+    }
+
+    @media (max-width: 768px) {
+        .form-container {
+            margin: 15px;
+            border-radius: 15px;
+        }
+
+        .form-header {
+            padding: 25px 20px;
+        }
+
+        .form-header h1 {
+            font-size: 2rem;
+        }
+
+        .task-form {
+            padding: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}

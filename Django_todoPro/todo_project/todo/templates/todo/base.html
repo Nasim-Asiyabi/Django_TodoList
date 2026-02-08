@@ -1,0 +1,374 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Todo App{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            color: #667eea;
+        }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover {
+            background-color: #f0f2f5;
+            color: #667eea;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border-radius: 25px;
+        }
+
+        .username {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+        }
+
+        .auth-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-login {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-register {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        main {
+            padding: 30px 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        .messages {
+            margin-bottom: 30px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.5s ease;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .alert-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        footer {
+            background: white;
+            padding: 30px 0;
+            margin-top: 50px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: #666;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: #667eea;
+        }
+
+        .copyright {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="{% url 'todo:task_list' %}" class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Todo App</h1>
+                        <p>Manage your tasks efficiently</p>
+                    </div>
+                </a>
+
+                <div class="nav-links">
+                    {% if user.is_authenticated %}
+                        <!-- Links for authenticated users -->
+                        <a href="{% url 'todo:task_list' %}" class="nav-link {% if request.resolver_match.url_name == 'task_list' %}active{% endif %}">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                        <a href="{% url 'todo:task_create' %}" class="nav-link {% if request.resolver_match.url_name == 'task_create' %}active{% endif %}">
+                            <i class="fas fa-plus-circle"></i> Add Task
+                        </a>
+                        <a href="{% url 'todo:expired_tasks_list' %}" class="nav-link {% if request.resolver_match.url_name == 'expired_tasks_list' %}active{% endif %}">
+                            <i class="fas fa-exclamation-triangle"></i> Expired Tasks
+                        </a>
+                        <a href="{% url 'todo:users_without_tasks' %}" class="nav-link {% if request.resolver_match.url_name == 'users_without_tasks' %}active{% endif %}">
+                            <i class="fas fa-user-slash"></i> Users Without Tasks
+                        </a>
+                        <a href="{% url 'todo:profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+                            <i class="fas fa-user"></i> Profile
+                        </a>
+
+                        <div class="user-info">
+                            <span class="username">
+                                <i class="fas fa-user-circle"></i> {{ user.username }}
+                            </span>
+                            <a href="{% url 'todo:logout' %}" class="logout-btn">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    {% else %}
+                        <!-- Links for non-authenticated users -->
+                        <div class="auth-links">
+                            <a href="{% url 'todo:login' %}" class="btn btn-login">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                            <a href="{% url 'todo:register' %}" class="btn btn-register">
+                                <i class="fas fa-user-plus"></i> Register
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="{% url 'todo:task_list' %}">Home</a>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'todo:profile' %}">Profile</a>
+                    <a href="{% url 'todo:logout' %}">Logout</a>
+                    {% else %}
+                    <a href="{% url 'todo:login' %}">Login</a>
+                    <a href="{% url 'todo:register' %}">Register</a>
+                    {% endif %}
+                    <a href="/admin/" target="_blank">Admin</a>
+                </div>
+                <div class="copyright">
+                    <p>Todo App &copy; {% now "Y" %} | Django Task Management System</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.transition = 'all 0.5s ease';
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-20px)';
+                    setTimeout(() => alert.remove(), 500);
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>
